@@ -39,11 +39,29 @@ contract FundMeTest is Test {
         fundMe.fund();
     }
 
+    function testFundWithDetailsFailWithoutEnoughETH() public {
+        vm.expectRevert();
+        fundMe.fundWithYourDetails("Claudious", "Bro, you are doing your best");
+    }
+
     function testFundUpdatesFundedDataStructure() public {
         vm.prank(USER);
         fundMe.fund{value: SEND_VALUE}();
         uint256 amountFunded = fundMe.getAddressToAmountFunded(USER);
         assertEq(amountFunded, SEND_VALUE);
+    }
+
+    function testFundUpdatesMemoDataStructure() public {
+        vm.prank(USER);
+        fundMe.fundWithYourDetails{value: SEND_VALUE}(
+            "Claudious",
+            "Bro, you are doing your best"
+        );
+
+        // uint256 amountFunded = fundMe.getAddressToAmountFunded(USER);
+        assertEq(fundMe.getMemo(0).name, "Claudious");
+
+        //assertEq(amountFunded, SEND_VALUE);
     }
 
     function testAddressFunderToArrayOfFunders() public funded {
